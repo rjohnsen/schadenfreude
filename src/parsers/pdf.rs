@@ -49,7 +49,22 @@ impl PdfDocument {
         let end_pos: Vec<usize> = self.find_positions(r"endobj", &content, PositionType::End);
 
         for index in 0..start_pos.len() {
-            println!("{:?}", &content[start_pos[index]..end_pos[index]]);
+            let mut data: Vec<u8> = (&content[start_pos[index]..end_pos[index]]).to_vec();
+            
+            let stream_start = self.find_positions(r"\nstream\n", &data, PositionType::End);
+            let stream_end = self.find_positions(r"endstream", &data, PositionType::Start);
+            
+            println!("\n");
+
+            if stream_start.len() == 0 && stream_end.len() == 0 {
+                println!("{:?}", str::from_utf8(&data).unwrap());
+        
+            } else {
+                // Note for further development
+                // Data.Drain returns the deleted section. We can use that to further handle content
+                data.drain(stream_start[0]..stream_end[0]);
+                println!("{:?}", str::from_utf8(&data).unwrap());
+            }
         }
     }
 
