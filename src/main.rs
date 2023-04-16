@@ -1,6 +1,8 @@
 use crate::utils::specimen;
+use crate::parsers::pdf;
 
 pub mod utils;
+pub mod parsers;
 
 use clap::Parser;
 
@@ -30,7 +32,11 @@ fn main() {
 
     // Parser selection
     match args.parser.to_lowercase().as_str() {
-        "pdf" => println!("PDF Parser selected."),
+        "pdf" => {
+            let mut document = pdf::PdfDocument::default();
+            document.parse(&specimen);
+
+        },
         _ => println!("Not implemented"),
     }
 }
