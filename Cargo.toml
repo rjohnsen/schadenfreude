@@ -7,5 +7,6 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "4.2.2", features = ["derive"] }
+regex = "1.7.3"
 toml = "0.7.3"
 yara = "0.19.0"
