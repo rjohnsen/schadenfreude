@@ -1,6 +1,7 @@
-use crate::utils::specimen;
 use crate::parsers::pdf;
+use crate::utils::specimen;
 
+pub mod core;
 pub mod utils;
 pub mod parsers;
 
@@ -29,6 +30,9 @@ fn main() {
     // parser.
     let mut specimen = specimen::Specimen::default();
     specimen.load(&args.file);
+
+    // Project and setup routine
+    core::project::load_project();
 
     // Parser selection
     match args.parser.to_lowercase().as_str() {
