@@ -38,7 +38,7 @@ fn main() {
     configuration.load();
 
     // Create case
-    case::create(&item.fingerprint.sha256);
+   let casename = case::create(&item.fingerprint.sha256);
 
     // Parser selection
     match args.parser.to_lowercase().as_str() {

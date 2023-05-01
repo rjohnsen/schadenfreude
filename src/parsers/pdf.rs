@@ -14,6 +14,7 @@ pub struct PdfObject {
     id: u8,
     revision: u8,
     position: PdfObjectPosition,
+    has_stream: bool,
     content: String
 }
 
@@ -35,7 +36,7 @@ impl PdfDocument {
         self.header = self.parse_header(&specimen.content);
         self.body = self.parse_body(&specimen.content);
 
-        self.display();
+        // self.display();
     }
 
     pub fn display(&mut self) {
@@ -75,72 +76,36 @@ impl PdfDocument {
             pdf_object.position = PdfObjectPosition{ start: start_pos[index], end: end_pos[index]};
 
             // Determine if object contain stream
+            let streamend_pos: Vec<usize> = self.find_positions(r"endstream", &raw_object, PositionType::Start);
+
+            if streamend_pos.len() > 0 {
+                pdf_object.has_stream = true;
+            } else {
+                pdf_object.has_stream = false
+            }
+
+            println!("{:?}", pdf_object);
+
+            /*
+            // Determine if object contain stream
             let streamstart_pos: Vec<usize> = self.find_positions(r">>stream", &raw_object, PositionType::End);
             let streamend_pos: Vec<usize> = self.find_positions(r"endstream", &raw_object, PositionType::Start);
 
             if streamstart_pos.len() > 0 && streamend_pos.len() > 0 {
-                // println!("Got stream");
+                println!("Got stream");
             } else {
                 if raw_object.is_ascii() == true {
                     pdf_object.content = String::from_utf8(raw_object).unwrap();
                 } else {
                     // Probably decode this thingy
-                    pdf_object.content = String::from_utf8_lossy(&raw_object).to_string();
+                    // pdf_object.content = String::from_utf8_lossy(&raw_object).to_string();
+                    self.parse_stream(&raw_object);
+
+
                 }
-            }
-            
-            object_list.push(pdf_object);
-            
-            /*
-            println!("---------------------------------------------------------------");
-            println!("\nObject #{:?}r{:?} @{:?}:{:?}", pdf_object.id,pdf_object.revision, pdf_object.position.start, pdf_object.position.end);
-            println!("{}\n", pdf_object.content);
-            */ 
-
-            /*
-            // Determine if ASCII
-            if raw_object.is_ascii() == true {
-                println!("obj {:?}", oid);
-                println!("\t{:?}", std::str::from_utf8(&raw_object));
-            } else {
-                println!("obj {} => !ASCII", oid);
-                println!("\t{:?}", String::from_utf8_lossy(&raw_object));
-            }
-            */ 
-
-
-            /*
-            let mut data: Vec<u8> = (&content[start_pos[index]..end_pos[index]]).to_vec();
-            
-            let stream_start = self.find_positions(r">>stream", &data, PositionType::End);
-            let stream_end = self.find_positions(r"endstream", &data, PositionType::Start);
-            
-            // Extract object metadata
-            let obj_regx = Regex::new(r"^(?P<oid>\d+)\s(?P<rev>\d+)\sobj").unwrap();
-            let obj_captures = obj_regx.captures(&data).unwrap();
-
-            // println!("{:?} => {:?}", &obj_captures["oid"], &obj_captures["rev"]);
-            let oid: u8 = std::str::from_utf8(&obj_captures.name("oid").unwrap().as_bytes()).unwrap().parse().unwrap();
-            let rev: u8 = std::str::from_utf8(&obj_captures.name("rev").unwrap().as_bytes()).unwrap().parse().unwrap();
-
-            println!("OID: {:?}", oid);
-
-            if stream_start.len() == 0 && stream_end.len() == 0 {
-                if (data.is_ascii() == true) {
-                    let result = String::from_utf8(data);
-                    println!("{:?}", true);
-                } else {
-                    println!("{:?}", &data);
-                }
-                
-                // println!("{:?}", str::from_utf8(&data));
-            } else {
-                // Note for further development
-                // Data.Drain returns the deleted section. We can use that to further handle content
-                // data.drain(stream_start[0]..stream_end[0]);
-                // println!("{:?}", str::from_utf8(&data).unwrap());
             }
             */
+            object_list.push(pdf_object);
         }
 
         return object_list;
@@ -159,5 +124,9 @@ impl PdfDocument {
         }
 
         return items;
+    }
+
+    fn parse_stream(&mut self, stream: &Vec<u8>) {
+        print!("{:?}", String::from_utf8_lossy(stream).to_string());
     }
 }
