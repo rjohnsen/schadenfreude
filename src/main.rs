@@ -31,21 +31,20 @@ fn main() {
     // In our sphere each individual file loaded is called a specimen. 
     // All files are loaded in the same way prior to running respective
     // parser.
-    let mut specimen = specimen::Specimen::default();
-    specimen.load(Path::new(&args.file));
+    let item = specimen::load(Path::new(&args.file));
 
     // Load configuration
     let mut configuration = config::Config::default();
     configuration.load();
 
     // Create case
-    case::create(&specimen.fingerprint.sha256);
+    case::create(&item.fingerprint.sha256);
 
     // Parser selection
     match args.parser.to_lowercase().as_str() {
         "pdf" => {
             let mut document = pdf::PdfDocument::default();
-            document.parse(&specimen);
+            document.parse(&item);
 
         },
         _ => println!("Not implemented"),

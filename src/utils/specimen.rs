@@ -18,36 +18,38 @@ pub struct Fingerprint {
     pub md5: String
 }
 
-impl Specimen {
-    pub fn load(&mut self, path: &std::path::Path) {
-        self.content = self.load_content(path);
-        self.name = self.extract_filename(path);
-        self.fingerprint.sha256 = self.get_sha256();
-        self.fingerprint.sha1 = self.get_sha1();
-        self.fingerprint.md5 = self.get_md5();
-    }
+pub fn load(path: &std::path::Path) -> Specimen {
+    let mut specimen = Specimen::default();
 
-    fn load_content(&mut self, path: &std::path::Path) -> Vec<u8> {
-        return fs::read(path).unwrap();
-    }
-    
-    fn extract_filename(&mut self, path: &std::path::Path) -> String {
-        let file_name = path.file_name().unwrap().to_str().unwrap();
-        return String::from(file_name);
-    }
+    specimen.content = load_content(path);
+    specimen.name = extract_filename(path);
+    specimen.fingerprint.sha256 = get_sha256(&specimen.content);
+    specimen.fingerprint.sha1 = get_sha1(&specimen.content);
+    specimen.fingerprint.md5 = get_md5(&specimen.content);
 
-    fn get_sha256(&mut self) -> String{
-        let hash = Sha256::digest(&self.content);
-        return format!("{:x}", hash);
-    }
+    return specimen;
+}
 
-    fn get_sha1(&mut self) -> String{
-        let hash = Sha1::digest(&self.content);
-        return format!("{:x}", hash);
-    }
+fn load_content(path: &std::path::Path) -> Vec<u8> {
+    return fs::read(path).unwrap();
+}
 
-    fn get_md5(&mut self) -> String{
-        let hash = Md5::digest(&self.content);
-        return format!("{:x}", hash);
-    }
+fn extract_filename(path: &std::path::Path) -> String {
+    let file_name = path.file_name().unwrap().to_str().unwrap();
+    return String::from(file_name);
+}
+
+fn get_sha256(content: &Vec<u8>) -> String{
+    let hash = Sha256::digest(content);
+    return format!("{:x}", hash);
+}
+
+fn get_sha1(content: &Vec<u8>) -> String{
+    let hash = Sha1::digest(content);
+    return format!("{:x}", hash);
+}
+
+fn get_md5(content: &Vec<u8>) -> String{
+    let hash = Md5::digest(content);
+    return format!("{:x}", hash);
 }
