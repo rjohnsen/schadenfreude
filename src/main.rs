@@ -1,4 +1,5 @@
 use crate::core::config;
+use crate::core::case;
 use crate::parsers::pdf;
 use crate::utils::specimen;
 use std::path::Path;
@@ -35,7 +36,10 @@ fn main() {
 
     // Load configuration
     let mut configuration = config::Config::default();
-    configuration.load(); 
+    configuration.load();
+
+    // Create case
+    case::create(&specimen.fingerprint.sha256);
 
     // Parser selection
     match args.parser.to_lowercase().as_str() {

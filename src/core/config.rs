@@ -1,6 +1,7 @@
 use std::fs;
 use std::fs::File;
 use std::path::Path;
+use std::path::PathBuf;
 use std::io::prelude::*;
 use serde::{ Serialize, Deserialize };
 
@@ -9,17 +10,28 @@ pub struct Config {
     obsidian_vault: String
 }
 
+const MAIN_FOLDER: &str = "Schadenfreude";
+const CONFIG_FILE: &str = ".config.toml";
+
 impl Config {
-    const MAIN_FOLDER: &str = "Schadenfreude";
-    const CONFIG_FILE: &str = ".config.toml";
     
     pub fn load(&mut self) {
-        let home_folder = dirs::home_dir().unwrap();
-        let main_folder = Path::new(&home_folder).join(Config::MAIN_FOLDER);
-        let config_file = Path::new(&main_folder).join(Config::CONFIG_FILE);
+        let main_folder = get_path();
+        let config_file = Path::new(&main_folder).join(CONFIG_FILE);
 
-        if main_folder.is_dir()  == false { fs::create_dir(&main_folder); }
-        if config_file.is_file() == false { self.create_config_file(&config_file); }
+        if main_folder.is_dir()  == false { 
+            match fs::create_dir(&main_folder) {
+                Ok(()) => println!("Directory created"),
+                Err(e) => println!("{:?}", e)
+            }
+        }
+        
+        if config_file.is_file() == false {
+            match self.create_config_file(&config_file) {
+                Ok(()) => println!("Config is file"),
+                Err(e) => println!("{:?}", e)
+            }
+        }
 
         let content = std::fs::read_to_string(config_file).unwrap();    
         let config: Config = toml::from_str::<Config>(&content).unwrap();
@@ -34,4 +46,9 @@ impl Config {
         file.write_all(toml)?;
         Ok(())
     }
+}
+
+pub fn get_path() -> PathBuf {
+    let home_folder = dirs::home_dir().unwrap();
+    return Path::new(&home_folder).join(MAIN_FOLDER);
 }
