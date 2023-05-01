@@ -1,5 +1,4 @@
 use std::fs;
-use std::path::Path;
 use sha2::Sha256;
 use sha2::Digest;
 use sha1::Sha1;

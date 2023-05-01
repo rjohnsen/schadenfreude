@@ -1,3 +1,4 @@
+use crate::core::config;
 use crate::parsers::pdf;
 use crate::utils::specimen;
 use std::path::Path;
@@ -30,11 +31,11 @@ fn main() {
     // All files are loaded in the same way prior to running respective
     // parser.
     let mut specimen = specimen::Specimen::default();
-    let path = Path::new(&args.file);
-    specimen.load(path);
+    specimen.load(Path::new(&args.file));
 
-    // Project and setup routine
-    core::project::load_project();
+    // Load configuration
+    let mut configuration = config::Config::default();
+    configuration.load(); 
 
     // Parser selection
     match args.parser.to_lowercase().as_str() {
