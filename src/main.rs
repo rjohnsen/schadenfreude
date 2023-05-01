@@ -33,10 +33,6 @@ fn main() {
     let path = Path::new(&args.file);
     specimen.load(path);
 
-
-    println!("{:?}", specimen);
-    /*
-
     // Project and setup routine
     core::project::load_project();
 
@@ -49,5 +45,4 @@ fn main() {
         },
         _ => println!("Not implemented"),
     }
-    */
 }
