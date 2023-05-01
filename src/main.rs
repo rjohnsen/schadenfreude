@@ -1,5 +1,6 @@
 use crate::parsers::pdf;
 use crate::utils::specimen;
+use std::path::Path;
 
 pub mod core;
 pub mod utils;
@@ -29,7 +30,12 @@ fn main() {
     // All files are loaded in the same way prior to running respective
     // parser.
     let mut specimen = specimen::Specimen::default();
-    specimen.load(&args.file);
+    let path = Path::new(&args.file);
+    specimen.load(path);
+
+
+    println!("{:?}", specimen);
+    /*
 
     // Project and setup routine
     core::project::load_project();
@@ -43,4 +49,5 @@ fn main() {
         },
         _ => println!("Not implemented"),
     }
+    */
 }
